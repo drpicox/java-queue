@@ -1,6 +1,9 @@
 package com.drpicox.queue;
 
 import org.junit.Test;
+
+import java.util.LinkedList;
+
 import static org.junit.Assert.*;
 
 public class QueueTest {
@@ -68,6 +71,15 @@ public class QueueTest {
         queue.receive(String.class, (String s) -> receiveCount++);
 
         assertEquals(receiveCount, 0);
+    }
 
+    @Test(expected=NonSerializableException.class)
+    public void nonSerializableMessagesFailAtSend() {
+        class NonSerializable {}
+        LinkedList<NonSerializable> noSerializableList = new LinkedList<>();
+        noSerializableList.add(new NonSerializable());
+
+        Queue queue = new Queue();
+        queue.send(noSerializableList);
     }
 }

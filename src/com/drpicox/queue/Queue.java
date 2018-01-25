@@ -1,6 +1,8 @@
 package com.drpicox.queue;
 
-import java.io.Serializable;
+import java.io.ByteArrayOutputStream;
+import java.io.IOException;
+import java.io.ObjectOutputStream;
 import java.util.LinkedList;
 import java.util.List;
 
@@ -14,8 +16,19 @@ public class Queue {
         receivers = new LinkedList<>();
     }
 
-    public void send(Serializable message) {
+    public void send(Object message) {
+        verifyMessageIsSerializable(message);
+
         messages.add(message);
+    }
+
+    private void verifyMessageIsSerializable(Object message) {
+        try {
+            ObjectOutputStream outputStream = new ObjectOutputStream(new ByteArrayOutputStream());
+            outputStream.writeObject(message);
+        } catch (IOException nonSerializableExceptionCause) {
+            throw new NonSerializableException(nonSerializableExceptionCause);
+        }
     }
 
     public <T> void receive(Class<T> messageClass, QueueReceiver<T> receiver) {
